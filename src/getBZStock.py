@@ -67,9 +67,8 @@ def getLowestGrowth(startDate, endDate):
             try:
                 stockCode = df_all_stock.index[i]
                 if stockCode[0] == '0' or  stockCode[0] == '3':
-                    if not float(ts.get_realtime_quotes(stockCode).price) == 0:
-                        t = ts.get_hist_data(stockCode,start='2014-01-01',end='2014-01-02')
-                        if float(t.close) > 0:
+                    if not float(ts.get_realtime_quotes(stockCode).price) == 0:                        
+                        if df_all_stock.ix[stockCode]['timeToMarket'] > 20140101:
                             stock = getStockInfo(startDate, endDate, stockCode)                
                             result[stockCode] = stock       
                             print  stockCode,'is finished'                     
@@ -86,4 +85,4 @@ if __name__ == '__main__':
     startDate = '2014-01-01'
     endDate = str(time.strftime("%Y-%m-%d",time.localtime(time.time())))
     df = getLowestGrowth(startDate, endDate)
-    print df['maxGrowthRate']
+    print df.loc[:,['maxGrowthRate','minPxAll','maxPxAll']]
