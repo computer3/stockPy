@@ -11,22 +11,33 @@ import tushare as ts
 import time
 import logging  
 from pandas import DataFrame
+from numpy import mean
+from urllib2 import URLError
 
-def getStockInfo(startDate, endDate,  stockCode):
+
+def getStockInfo(startDate, endDate,  stockCode,specialDate):
+    if startDate > specialDate:
+        print "startDate should be before the specialDate"
+        return None
     stock = {}
-    df_tran = ts.get_hist_data(stockCode, start=startDate, end=endDate)
-    df_tran_2015 = df_tran['2015-01-01':]
-    stock['maxPx2015'] = max(df_tran_2015.close)
-    stock['minPx2015'] = min(df_tran_2015.close)
+    df_tran = ts.get_h_data(stockCode, start=startDate, end=endDate)
+    df_tran['close'] = df_tran['close'].convert_objects(convert_numeric=True)
+    df_tran['volume'] = df_tran['volume'].convert_objects(convert_numeric=True)
+    df_tran['amount'] = df_tran['amount'].convert_objects(convert_numeric=True)
+    
+    #按日期由远及近进行排序
+    df_tran = df_tran.sort_index()
+
+    stock['maxPxSpecialDate'] = max(df_tran[specialDate:].close)
+    stock['minPxSpecialDate'] = min(df_tran[specialDate:].close)
     stock['maxPxAll']  = max(df_tran.close)
     stock['minPxAll'] = min(df_tran.close)
-    stock['maxVol20']  = max(df_tran[-20:].volume)*1000
-    stock['maxGrowthRate'] = (stock['maxPxAll'] - stock['minPxAll'])/stock['minPxAll']
-    df_pre_tran = df_tran[-1:]    
-    stock['prePx'] = float(df_pre_tran.close)
-    stock['prePXMa5'] = float(df_pre_tran.ma5)
-    stock['preVolMa5'] = float(df_pre_tran.v_ma5)*1000
-    stock['preAmtMa5'] = stock['prePXMa5'] * stock['preVolMa5']
+    stock['maxVol20']  = max(df_tran[-20:].volume)
+    stock['maxGrowthRate'] = (stock['maxPxAll'] - stock['minPxAll'])/stock['minPxAll']  
+    stock['prePx'] = df_tran[-1:].close
+    stock['prePXMa5'] = mean(df_tran[-5:].close)
+    stock['preVolMa5'] = mean(df_tran[-5:].volume)
+    stock['preAmtMa5'] = mean(df_tran[-5:].amount)
     return stock
 
 def chooseBZStock(startDate, endDate):
@@ -44,9 +55,9 @@ def chooseBZStock(startDate, endDate):
             if float(ts.get_realtime_quotes(stockCode).price) == 0:
                 continue;
             print stockCode,'is starting'
-            stock = getStockInfo(startDate, endDate, stockCode)
+            stock = getStockInfo(startDate, endDate, stockCode,'2015-01-01')
     
-            if  stock['prePx']<= stock['maxPx2015']*0.9 and stock['prePx'] >=stock['maxPx2015'] * 0.8:                     
+            if  stock['prePx']<= stock['maxPxSpecialDate']*0.9 and stock['prePx'] >=stock['maxPxSpecialDate'] * 0.8:                     
                 if (stock['maxPxAll'] - stock['minPxAll'])/stock['minPxAll'] <2:                                
                     if stock['preVolMa5'] <= stock['maxVol20']*0.5 and stock['preVolMa5'] >= stock['maxVol20']*0.3:                     
                         if stock['preAmtMa5'] < 500000000:
@@ -63,26 +74,40 @@ def chooseBZStock(startDate, endDate):
 def getLowestGrowth(startDate, endDate):
     result = {}
     df_all_stock = ts.get_stock_basics()
-    for i in range(len(df_all_stock)):    
-            try:
-                stockCode = df_all_stock.index[i]
-                if stockCode[0] == '0' or  stockCode[0] == '3':
-                    if not float(ts.get_realtime_quotes(stockCode).price) == 0:                        
-                        if df_all_stock.ix[stockCode]['timeToMarket'] > 20140101:
-                            stock = getStockInfo(startDate, endDate, stockCode)                
-                            result[stockCode] = stock       
-                            print  stockCode,'is finished'                     
-            except BaseException, e:
-                print 'Error',stockCode,str(e)
-                continue                  
+    stockCodeList = list(df_all_stock.index)
+    szStockList = [code for code in stockCodeList if code[0] == '0' or code[0] == '3']
+
+    while len(szStockList) > 0:
+        try:
+            stockCode = szStockList[-1]
+            print  stockCode,'is started'
+            if float(ts.get_realtime_quotes(stockCode).price) > 0 and df_all_stock.ix[stockCode]['timeToMarket'] < 20140101:  
+                stock = getStockInfo(startDate, endDate, stockCode,'2015-01-01')                
+                result[stockCode] = stock       
+                print  stockCode,'is finished'
+                szStockList.pop()
+            else:
+                szStockList.pop()     
+        except URLError,e:
+            print 'Error',stockCode,str(e)
+            continue  
+        except BaseException, e:
+            print 'Error',stockCode,str(e)
+            szStockList.pop()
+            continue       
+ 
+                 
     df = DataFrame(result).T   
     df = df.sort(columns = 'maxGrowthRate')
-    return df[:30]
+    return df[:10]
 
     
     
 if __name__ == '__main__':
     startDate = '2014-01-01'
     endDate = str(time.strftime("%Y-%m-%d",time.localtime(time.time())))
+    stockCode = '600583'
+
+#     print getStockInfo(startDate, endDate, stockCode,'2015-01-01')   
     df = getLowestGrowth(startDate, endDate)
     print df.loc[:,['maxGrowthRate','minPxAll','maxPxAll']]
