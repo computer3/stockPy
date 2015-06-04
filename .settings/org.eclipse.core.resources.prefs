@@ -1,3 +1,7 @@
 eclipse.preferences.version=1
+encoding//src/dataLoad/tushareDataLoad.py=utf-8
 encoding//src/getBZStock.py=utf-8
+encoding//src/getTPStock.py=utf-8
+encoding//src/indexAnalysis.py=utf-8
+encoding//src/test.py=utf-8
 encoding/<project>=UTF-8
