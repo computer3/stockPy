@@ -40,10 +40,7 @@ def loadStockBasicInfo():
 
 
 #获取沪深上市公司复权的历史数据
-
-
-
-def loadHisTranData(startDate,endDate,codeList):    
+def loadHisTranDataFQ(startDate,endDate,codeList):    
     engine = create_engine('mysql://root:@127.0.0.1/stock?charset=utf8')
     while len(codeList) > 0:
         try:
@@ -63,7 +60,26 @@ def loadHisTranData(startDate,endDate,codeList):
             codeList.pop()
             continue
         
-
+#获取沪深上市公司未复权的历史数据
+def loadHisTranData(startDate,endDate,codeList):    
+    engine = create_engine('mysql://root:@127.0.0.1/stock?charset=utf8')
+    while len(codeList) > 0:
+        try:
+            code = codeList[-1]
+            print code, 'is started'
+            df = ts.get_hist_data(code, start=startDate, end=endDate)
+            df['tran_date'] = df.index
+            df['code'] = code
+            df.to_sql('his_trans', engine,if_exists='append',index=False)
+            print  code,'is finished'
+            codeList.pop()
+        except URLError as e:
+            print 'Error', code, str(e)
+            continue
+        except BaseException as e:
+            print 'Error', code, str(e)
+            codeList.pop()
+            continue
 if __name__ == '__main__':
 #     loadStockBasicInfo()
     startDate = '2013-01-01'
