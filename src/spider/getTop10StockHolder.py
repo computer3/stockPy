@@ -13,6 +13,7 @@ import tushare as ts
 from tools import dbOper
 
 def getWebContent(headers, url):
+    url=  url.encode('utf-8')
     request = urllib2.Request(url, headers=headers)
     response = urllib2.urlopen(request)
     soup = BeautifulSoup(response)
@@ -24,16 +25,17 @@ def getWebContent(headers, url):
 
 def getStockHolderInfok(stockCodeList):
     user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101 Firefox/38.0'          
-    cooke = 'ASP.NET_SessionId=ayy1odnzkb2jsoipk5jjz4aw; pgv_pvi=8244609964; pgv_info=ssi=s8278901296'    
+    cooke = 'pgv_pvi=8244609964; emstat_bc_emcount=164993042066668138; emstat_ss_emcount=15_1433872119_1146441478; pgv_info=ssi=s9950471570'    
     headers = { 'User-Agent' : user_agent,
-                    'Cookie':cooke,
+                    'Cookie' : cooke,
                     'Connection':'keep-alive',
                     'Host':'hqdigi2.eastmoney.com',
                     'Referer':''}
 
     for stockCode in stockCodeList:
         try: 
-            if stockCode[0] == 6:
+            stockCode = stockCode.encode('utf-8')
+            if stockCode[0] == '6':
                 stockCodeStr = 'sh'+stockCode
             else:
                 stockCodeStr = 'sz'+stockCode
@@ -41,7 +43,7 @@ def getStockHolderInfok(stockCodeList):
             pageUrl = 'http://f10.eastmoney.com/f10_v2/ShareholderResearch.aspx?code='+stockCodeStr
             headers['Referer'] = pageUrl
             content = getWebContent(headers, pageUrl)
-    #         print content
+            print content
             items = re.findall(re.compile('id="TTS_Table_Div".*?<table><tr>(.*?)</tr></table>',re.S)  ,content)
             if len(items) == 1:
                 trStrs = re.findall(re.compile('<tr>(.*?)</tr>',re.S)  ,items[0])
@@ -80,4 +82,6 @@ def getStockHolderInfok(stockCodeList):
 if __name__ == '__main__':
     reportDate = str(time.strftime("%Y-%m-%d",time.localtime(time.time())))
     stockCodeList = dbOper.getStockCodeListForStockHolder(reportDate)
+    stockCodeList = ['600030']
+    print len(stockCodeList),' need to load'
     getStockHolderInfok(stockCodeList)

@@ -21,7 +21,7 @@ def insertIntoDb(sql):
 def getStockCodeListForStockHolder(reportDate):
     df_ap = ts.get_stock_basics()    
     mysql_conn  = pyodbc.connect(conn_info,charset='utf8')
-    sql ="select code from stock_holder_info t where date(t.report_date) = '"+reportDate+"';"
+    sql ="select distinct code from stock_holder_info t where date(t.report_date) = '"+reportDate+"';"
     df_exist =  psql.read_sql_query(sql, mysql_conn)
     df_result = df_ap[~df_ap.index.isin(df_exist.code)]
     mysql_conn.close() 
