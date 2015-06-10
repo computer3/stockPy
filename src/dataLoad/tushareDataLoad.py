@@ -72,5 +72,6 @@ if __name__ == '__main__':
 #     df = ts.get_stock_basics()
 #     codeList = list(df.index)
     codeList = dbOper.getStockCodeListForHistTran()
+    print len(codeList)
     loadHisTranData(startDate,endDate,codeList)
 
