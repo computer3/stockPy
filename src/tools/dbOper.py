@@ -27,11 +27,18 @@ def getStockCodeListForStockHolder(reportDate):
     mysql_conn.close() 
     return list(df_result.index)
 
+def getStockCodeListForHistTran():
+    df_ap = ts.get_stock_basics()    
+    mysql_conn  = pyodbc.connect(conn_info,charset='utf8')
+    sql ="select distinct code from his_trans t ;"
+    df_exist =  psql.read_sql_query(sql, mysql_conn)
+    df_result = df_ap[~df_ap.index.isin(df_exist.code)]
+    mysql_conn.close() 
+    return list(df_result.index)
+
 
 if __name__ == '__main__':
-    df =  getStockCodeListForStockHolder(str(time.strftime("%Y-%m-%d",time.localtime(time.time()))))
-    
-    sql = "INSERT into  stock_holder_info (code,holder_name,stock_holder_type,position_num,position_rate,change_num,change_rate,report_date) VALUES('002379','于荣强','流通A股','329,240,000','35.54%','不变','--','2015-06-09');"
-    insertIntoDb(sql)
-    
+    ls = getStockCodeListForHistTran()
+    print len(ls)
+    print ls
     

@@ -11,26 +11,11 @@ from sqlalchemy import create_engine
 import tushare as ts
 from urllib2 import URLError
 import time
+from tools import dbOper
 
 
 
 #获取沪深上市公司基本情况
-# code,代码
-# name,名称
-# industry,所属行业
-# area,地区
-# pe,市盈率
-# outstanding,流通股本
-# totals,总股本(万)
-# totalAssets,总资产(万)
-# liquidAssets,流动资产
-# fixedAssets,固定资产
-# reserved,公积金
-# reservedPerShare,每股公积金
-# eps,每股收益
-# bvps,每股净资
-# pb,市净率
-# timeToMarket,上市日期
 def loadStockBasicInfo():
     engine = create_engine('mysql://root:@127.0.0.1/stock?charset=utf8') 
     df = ts.get_stock_basics()
@@ -83,8 +68,9 @@ def loadHisTranData(startDate,endDate,codeList):
 if __name__ == '__main__':
 #     loadStockBasicInfo()
     startDate = '2013-01-01'
-    endDate = str(time.strftime("%Y-%m-%d",time.localtime(time.time())))
-    df = ts.get_stock_basics()
-    codeList = list(df.index)
+    endDate = '2015-06-01'
+#     df = ts.get_stock_basics()
+#     codeList = list(df.index)
+    codeList = dbOper.getStockCodeListForHistTran()
     loadHisTranData(startDate,endDate,codeList)
 
