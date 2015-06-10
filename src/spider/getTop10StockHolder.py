@@ -80,8 +80,7 @@ def getStockHolderInfok(stockCodeList):
                      
 
 if __name__ == '__main__':
-    reportDate = str(time.strftime("%Y-%m-%d",time.localtime(time.time())))
+    reportDate = '2015-06-09'
     stockCodeList = dbOper.getStockCodeListForStockHolder(reportDate)
-    stockCodeList = ['600030']
     print len(stockCodeList),' need to load'
     getStockHolderInfok(stockCodeList)
