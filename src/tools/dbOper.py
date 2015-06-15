@@ -36,9 +36,16 @@ def getStockCodeListForHistTran():
     mysql_conn.close() 
     return list(df_result.index)
 
+def getHistTran(startDate, endDate):
+  
+    mysql_conn  = pyodbc.connect(conn_info,charset='utf8')
+    sql ="select * from his_trans t where t.tran_date >='"+startDate+"' and t.tran_date <= '"+endDate+"'"
+    df =  psql.read_sql_query(sql, mysql_conn)
+    return df
 
 if __name__ == '__main__':
-    ls = getStockCodeListForHistTran()
-    print len(ls)
-    print ls
-    
+#     ls = getStockCodeListForHistTran()
+#     print len(ls)
+#     print ls
+    df = getHistTran('2014-01-01','2015-06-01')
+    print len(df)
