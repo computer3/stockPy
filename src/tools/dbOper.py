@@ -27,10 +27,10 @@ def getStockCodeListForStockHolder(reportDate):
     mysql_conn.close() 
     return list(df_result.index)
 
-def getStockCodeListForHistTran():
+def getStockCodeListForHistTran(start_date):
     df_ap = ts.get_stock_basics()    
     mysql_conn  = pyodbc.connect(conn_info,charset='utf8')
-    sql ="select distinct code from his_trans t ;"
+    sql ="select distinct code from his_trans t where t.tran_date > '"+start_date+"'"
     df_exist =  psql.read_sql_query(sql, mysql_conn)
     df_result = df_ap[~df_ap.index.isin(df_exist.code)]
     mysql_conn.close() 
@@ -47,5 +47,5 @@ if __name__ == '__main__':
 #     ls = getStockCodeListForHistTran()
 #     print len(ls)
 #     print ls
-    df = getHistTran('2014-01-01','2015-06-01')
+    df = getStockCodeListForHistTran('2015-06-14')
     print len(df)
