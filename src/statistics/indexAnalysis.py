@@ -7,6 +7,7 @@ Created on 2015年6月4日
 import tushare as ts
 import pandas as pd
 from tools import dbOper
+import time
 # sh=上证指数 sz=深圳成指 hs300=沪深300指数 sz50=上证50 zxb=中小板 cyb=创业板
 def getHistIndexData():
     df_sh= ts.get_hist_data('sh') 
@@ -63,13 +64,17 @@ def getHistIndexData1(startDate,endDate):
     df_result = df_sh.append(df_sz)
     df_result = df_result.append(df_zxb)
     df_result = df_result.append(df_cyb)
-    df_result = df_result.loc[:,['date','mkt','close','price_change','up','down','nochange']]
+    df_result['gap'] = df_result.high - df_result.low
 
-    df_result.columns=['日期','指数','收市点位','涨跌幅','上涨个股数量','下跌个股数量','平盘个股数量']
-    df_result.to_csv(r'D:\stock\index_stat.csv',index = False)
+    df_result = df_result.loc[:,['date','mkt','close','price_change','gap','up','down','nochange']]
+
+
+    fileName = r'D:\stock\index_stat_' +startDate+'_' + endDate + '.csv'
+    df_result.to_csv(fileName,index = False)
  
     
 
 if __name__ == '__main__':
-    getHistIndexData1('2015-01-01','2015-06-14')
-    print 'finished'
+    print str(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))),'start'
+    getHistIndexData1('2015-01-01','2015-06-16')
+    print str(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))),'finished'
