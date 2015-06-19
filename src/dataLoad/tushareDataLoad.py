@@ -67,9 +67,9 @@ def loadHisTranData(startDate,endDate,codeList):
             continue
 if __name__ == '__main__':
 #     loadStockBasicInfo()
-    startDate = '2015-06-15'
-    endDate = '2015-06-16'
-    checkDate = '2015-06-14'
+    startDate = '2015-06-17'
+    endDate = '2015-06-18'
+    checkDate = '2015-06-16'
     
     codeList = dbOper.getStockCodeListForHistTran(checkDate)
     print len(codeList)

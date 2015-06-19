@@ -10,8 +10,8 @@ from tools import dbOper
 import time
 # sh=上证指数 sz=深圳成指 hs300=沪深300指数 sz50=上证50 zxb=中小板 cyb=创业板
 def getHistIndexData():
-    df_sh= ts.get_hist_data('sh') 
-#     df_sh = ts.get_h_data('000001', index=True,start='2006-01-01',end='2015-06-09')       
+#     df_sh= ts.get_hist_data('sh') 
+    df_sh = ts.get_h_data('000001', index=True,start='2006-01-01',end='2015-06-18')       
     df_sh['gap'] = (df_sh['high']-df_sh['low'])*100/df_sh['close']
     df_sh = df_sh.sort_index(ascending=False)
     df = df_sh.loc[:,['close','gap']]
@@ -76,5 +76,6 @@ def getHistIndexData1(startDate,endDate):
 
 if __name__ == '__main__':
     print str(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))),'start'
-    getHistIndexData1('2015-01-01','2015-06-16')
+    #getHistIndexData1('2015-01-01','2015-06-18')
+    getHistIndexData()
     print str(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))),'finished'

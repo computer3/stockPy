@@ -47,5 +47,5 @@ if __name__ == '__main__':
 #     ls = getStockCodeListForHistTran()
 #     print len(ls)
 #     print ls
-    df = getStockCodeListForHistTran('2015-06-14')
+    df = getStockCodeListForHistTran('2015-06-17')
     print len(df)
