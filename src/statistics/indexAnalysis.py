@@ -106,6 +106,6 @@ def getIndexChangeRate(startDate,endDate):
 
 if __name__ == '__main__':
     print str(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))),'start'
-    getIndexChangeRate('2015-06-01','2015-07-03')
+    getIndexChangeRate('2015-06-01','2015-07-08')
 #     getHistIndexData()
     print str(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))),'finished'
