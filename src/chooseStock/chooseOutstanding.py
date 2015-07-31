@@ -1,7 +1,7 @@
 #coding=utf-8
 '''
 Created on 2015年7月9日
-
+获取流通市值小于15亿，且当前价格与14年6月底差不多的
 @author: Administrator
 '''
 import tushare as ts
@@ -13,12 +13,12 @@ def getOutStandingStock():
     df_result = pd.merge(df_stk,df_trans,on = 'code')
     df_result = df_result.loc[:,['code','name_x','industry','outstanding','trade']]
     df_result['outstanding_amt'] =  df_result['outstanding'] * df_result['trade'] * 10000    
-    df_result = df_result[df_result.outstanding_amt < 1500000000]
+    df_result = df_result[df_result.outstanding_amt < 5000000000]
     return df_result
     
 def getStockList():
     startDate = '2014-06-20'
-    endDate = '2015-07-08'
+    endDate = '2015-07-30'
     df_stock = getOutStandingStock();
     fileName = r'd:\stock\outStandingChoose.csv'
     with open(fileName, 'w') as f:
